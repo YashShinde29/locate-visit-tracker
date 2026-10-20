@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Your location</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8D%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <span class="brand">
+        <span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
+        <span>Locate</span>
+      </span>
+    </div>
+  </nav>
+
+  <main class="container narrow">
+    <div class="page-head">
+      <h1>Where you're opening this from</h1>
+      <p>This page estimates your location from your internet connection. It can't see anything precise unless you choose to share it.</p>
+    </div>
+
+    <section class="panel">
+      <div class="panel-head">
+        <span class="ph-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
+        <div><h2>Approximate location</h2><p>From your IP address — city-level, not an exact address.</p></div>
+      </div>
+      <div class="status-line" id="ipStatus"><span class="spinner" style="width:14px;height:14px"></span> Checking your connection…</div>
+      <dl class="detail-grid" id="ipData" style="margin-top:.9rem" hidden></dl>
+      <iframe class="map" id="ipMap" title="Approximate location map" hidden loading="lazy"></iframe>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <span class="ph-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg></span>
+        <div><h2>Share your exact location?</h2><p>Optional. Your device will ask permission — you can say no.</p></div>
+      </div>
+      <button class="btn block" id="precise"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-6 8-12a8 8 0 0 0-16 0c0 6 8 12 8 12Z"/><circle cx="12" cy="10" r="3"/></svg> Share my precise location</button>
+      <div class="status-line" id="pStatus" style="margin-top:.9rem" hidden></div>
+      <dl class="detail-grid" id="pData" style="margin-top:.9rem" hidden></dl>
+      <iframe class="map" id="pMap" title="Precise location map" hidden loading="lazy"></iframe>
+    </section>
+
+    <div id="continueWrap" hidden>
+      <a class="btn block" id="continueBtn" rel="noopener">Continue <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+    </div>
+
+    <div class="notice info">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+      <div>Your approximate location comes from your IP address, which every website you visit can see. Nothing precise is read unless you tap the button above and allow it.</div>
+    </div>
+  </main>
+
+  <footer class="footer">Locate</footer>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const qs = new URLSearchParams(location.search);
+    const meta = { id: qs.get('id') || '', label: qs.get('label') || '' };
+    const dest = qs.get('to') || '';
+    let ipGeo = {};
+
+    // Optional "Continue" button to a destination the link creator set.
+    if (dest) {
+      try {
+        const u = new URL(dest);
+        if (u.protocol === 'http:' || u.protocol === 'https:') {
+          $('continueBtn').href = dest;
+          $('continueWrap').hidden = false;
+        }
+      } catch { /* ignore invalid destinations */ }
+    }
+
+    function mapSrc(lat, lon, zoom) {
+      const d = zoom >= 15 ? 0.01 : 0.15;
+      const bbox = [Number(lon) - d, Number(lat) - d, Number(lon) + d, Number(lat) + d].join(',');
+      return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lon}`;
+    }
+    const live = (txt) => `<span class="dot live"></span> ${txt}`;
+
+    async function report(preciseGeo) {
+      try {
+        await fetch('/api/report', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: meta.id, label: meta.label, ip: ipGeo.ip, ipGeo, preciseGeo,
+            userAgent: navigator.userAgent, page: location.href, time: new Date().toISOString(),
+          }),
+        });
+      } catch { /* best effort */ }
+    }
+
+    // IP location on load
+    (async () => {
+      try {
+        const r = await fetch('/api/geo');
+        ipGeo = await r.json();
+        const place = [ipGeo.city, ipGeo.region, ipGeo.country].filter(Boolean).join(', ') || 'Unknown';
+        $('ipStatus').innerHTML = live('Approximate location found');
+        $('ipData').innerHTML = `
+          <dt>Place</dt><dd>${place}</dd>
+          <dt>IP address</dt><dd>${ipGeo.ip || '—'}</dd>
+          ${ipGeo.latitude ? `<dt>Coordinates</dt><dd>${ipGeo.latitude}, ${ipGeo.longitude}</dd>` : ''}
+          ${ipGeo.timezone ? `<dt>Time zone</dt><dd>${ipGeo.timezone}</dd>` : ''}`;
+        $('ipData').hidden = false;
+        if (ipGeo.latitude && ipGeo.longitude) { $('ipMap').src = mapSrc(ipGeo.latitude, ipGeo.longitude, 11); $('ipMap').hidden = false; }
+        report(null);
+      } catch {
+        $('ipStatus').innerHTML = '<span class="dot"></span> Couldn\'t estimate your location right now.';
+      }
+    })();
+
+    // Precise location on tap
+    $('precise').addEventListener('click', () => {
+      if (!navigator.geolocation) {
+        $('pStatus').hidden = false;
+        $('pStatus').innerHTML = '<span class="dot"></span> Your browser doesn\'t support precise location.';
+        return;
+      }
+      $('precise').disabled = true;
+      $('pStatus').hidden = false;
+      $('pStatus').innerHTML = live('Waiting for your permission…');
+
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const { latitude, longitude, accuracy } = pos.coords;
+        let place = '';
+        try {
+          const g = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`);
+          const d = await g.json();
+          place = [d.locality, d.principalSubdivision, d.countryName].filter(Boolean).join(', ');
+        } catch { /* optional */ }
+        $('pStatus').innerHTML = live('Precise location shared');
+        $('pData').innerHTML = `
+          ${place ? `<dt>Near</dt><dd>${place}</dd>` : ''}
+          <dt>Coordinates</dt><dd>${latitude.toFixed(6)}, ${longitude.toFixed(6)}</dd>
+          <dt>Accuracy</dt><dd>±${Math.round(accuracy)} m</dd>`;
+        $('pData').hidden = false;
+        $('pMap').src = mapSrc(latitude, longitude, 16); $('pMap').hidden = false;
+        $('precise').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Shared';
+        report({ latitude, longitude, accuracy, place });
+      }, (err) => {
+        $('precise').disabled = false;
+        $('pStatus').innerHTML = '<span class="dot"></span> ' + (err.code === 1
+          ? 'Permission denied — nothing precise was shared.'
+          : 'Couldn\'t get a precise location. Try again outdoors or on another device.');
+      }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+    });
+  </script>
+</body>
+</html>

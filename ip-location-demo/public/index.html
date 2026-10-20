@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Locate · Create a tracking link</title>
+  <meta name="description" content="Create a named link that shows an approximate location when opened." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8D%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="/">
+        <span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
+        <span>Locate <small>Location link dashboard</small></span>
+      </a>
+      <div class="nav-actions">
+        <a class="btn secondary sm" href="/dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg> Dashboard</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container narrow">
+    <div class="page-head">
+      <h1>Create a tracking link</h1>
+      <p>Give each link a name, share it, and see where it's opened on your dashboard. Approximate location comes from the visitor's IP; precise location is only read if they allow it.</p>
+    </div>
+
+    <section class="panel">
+      <div class="panel-head">
+        <span class="ph-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.8 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.8-1.7"/></svg></span>
+        <div><h2>New link</h2><p>Name it so you can tell your links apart later.</p></div>
+      </div>
+
+      <div class="field" id="f-name">
+        <label class="label" for="name">Custom name <span class="req">*</span></label>
+        <input class="input" id="name" type="text" placeholder="e.g. Project A, Client X, Instagram bio" autocomplete="off" />
+        <p class="hint">Required. Create one link per purpose — every visit is filed under this name.</p>
+        <p class="field-error" id="e-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Please enter a name for this link.</p>
+      </div>
+
+      <div class="field" id="f-dest">
+        <label class="label" for="dest">Destination URL <span style="color:var(--text-2);font-weight:500">(optional)</span></label>
+        <input class="input" id="dest" type="url" inputmode="url" placeholder="https://example.com — where to send the visitor afterward" autocomplete="off" />
+        <p class="hint">Optional. If set, the opened page shows a "Continue" button to this address. Leave empty to just show the location page.</p>
+        <p class="field-error" id="e-dest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Enter a valid URL starting with http:// or https://</p>
+      </div>
+
+      <div style="margin-top:1.25rem">
+        <button class="btn" id="create">
+          <span class="btn-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Create link</span>
+        </button>
+      </div>
+
+      <div class="form-success" id="success">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        <div><strong>Link created.</strong> Copy it below and share it. Visits will show on your dashboard.</div>
+      </div>
+
+      <div class="result" id="result">
+        <span class="url" id="url"></span>
+        <button class="btn secondary sm" id="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy</button>
+        <a class="btn secondary sm" id="open" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg> Preview</a>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <span class="ph-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span>
+        <div><h2>How it works</h2></div>
+      </div>
+      <div class="detail-grid" style="grid-template-columns:auto 1fr; gap:.6rem 1rem; font-family:inherit; font-size:.9rem">
+        <dt style="font-family:var(--mono);color:var(--primary)">IP</dt><dd style="font-family:inherit">Approximate location (usually the city) is read on the server, no key needed.</dd>
+        <dt style="font-family:var(--mono);color:var(--primary)">GPS</dt><dd style="font-family:inherit">Precise location needs the visitor to tap <em>Allow</em> — the browser enforces this.</dd>
+        <dt style="font-family:var(--mono);color:var(--primary)">Saved</dt><dd style="font-family:inherit">Every visit is stored and shown on your <a href="/dashboard">dashboard</a>, where you can search and delete it.</dd>
+      </div>
+    </section>
+
+    <div class="notice warn" style="margin-top:1rem">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+      <div><strong>Use it responsibly.</strong> Reading someone's location without telling them can break privacy laws and platform rules. Use links with people who know what they do, and don't track anyone without consent.</div>
+    </div>
+  </main>
+
+  <footer class="footer">Runs free on Vercel · Blob storage · no paid APIs</footer>
+
+  <div class="toast-wrap" id="toasts"></div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    let currentUrl = '';
+
+    function toast(msg, kind = 'success') {
+      const el = document.createElement('div');
+      el.className = `toast ${kind}`;
+      el.innerHTML = (kind === 'success'
+        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>'
+        : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>') + `<span>${msg}</span>`;
+      $('toasts').appendChild(el);
+      setTimeout(() => el.remove(), 2200);
+    }
+
+    const randId = () => Math.random().toString(36).slice(2, 8);
+    const validUrl = (s) => { try { const u = new URL(s); return u.protocol === 'http:' || u.protocol === 'https:'; } catch { return false; } };
+
+    function clearErrors() {
+      $('f-name').classList.remove('has-error'); $('name').classList.remove('invalid');
+      $('f-dest').classList.remove('has-error'); $('dest').classList.remove('invalid');
+    }
+
+    async function create() {
+      clearErrors();
+      const name = $('name').value.trim();
+      const dest = $('dest').value.trim();
+      let ok = true;
+
+      if (!name) { $('f-name').classList.add('has-error'); $('name').classList.add('invalid'); ok = false; }
+      if (dest && !validUrl(dest)) { $('f-dest').classList.add('has-error'); $('dest').classList.add('invalid'); ok = false; }
+      if (!ok) { $('name').focus(); return; }
+
+      // brief loading state (generation is instant, but give clear feedback)
+      const btn = $('create');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Creating…';
+      await new Promise((r) => setTimeout(r, 350));
+
+      const params = new URLSearchParams();
+      params.set('id', randId());
+      params.set('label', name);
+      if (dest) params.set('to', dest);
+      currentUrl = `${location.origin}/visit?${params.toString()}`;
+
+      $('url').textContent = currentUrl;
+      $('open').href = currentUrl;
+      $('success').classList.add('show');
+      $('result').classList.add('show');
+
+      btn.disabled = false;
+      btn.innerHTML = '<span class="btn-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Create another</span>';
+      toast('Link created');
+    }
+
+    $('create').addEventListener('click', create);
+    $('name').addEventListener('keydown', (e) => { if (e.key === 'Enter') create(); });
+    $('name').addEventListener('input', () => { $('f-name').classList.remove('has-error'); $('name').classList.remove('invalid'); });
+    $('dest').addEventListener('input', () => { $('f-dest').classList.remove('has-error'); $('dest').classList.remove('invalid'); });
+
+    $('copy').addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(currentUrl); toast('Copied to clipboard'); }
+      catch { toast('Copy failed', 'error'); }
+    });
+  </script>
+</body>
+</html>

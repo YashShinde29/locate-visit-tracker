@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Locate · Dashboard</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8D%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="/">
+        <span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
+        <span>Locate <small>Location link dashboard</small></span>
+      </a>
+      <div class="nav-actions">
+        <a class="btn sm" href="/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> New link</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <div class="page-head">
+      <h1>Dashboard</h1>
+      <p>Every visit to your links, newest first. Search, sort, and remove entries. Only you can see this page.</p>
+    </div>
+
+    <div class="notice warn" id="keywarn" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+      <div>This page is open to anyone with the link. To lock it, add a <span class="mono">DASHBOARD_KEY</span> environment variable in Vercel, redeploy, then open <span class="mono">/dashboard?key=YOUR_KEY</span>.</div>
+    </div>
+
+    <section class="stats">
+      <div class="stat links"><span class="s-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 0 1 0 10h-2"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span><div><div class="s-num" id="stLinks">—</div><div class="s-label">Links</div></div></div>
+      <div class="stat visits"><span class="s-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span><div><div class="s-num" id="stVisits">—</div><div class="s-label">Saved visits</div></div></div>
+      <div class="stat selected"><span class="s-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><div><div class="s-num" id="stSelected">0</div><div class="s-label">Selected</div></div></div>
+    </section>
+
+    <div class="controls">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input class="input" id="search" type="text" placeholder="Search by name, location, or IP…" autocomplete="off" aria-label="Search visits" />
+      </div>
+      <select class="input" id="filterLink" aria-label="Filter by link"><option value="">All links</option></select>
+      <select class="input" id="sort" aria-label="Sort order">
+        <option value="newest">Newest first</option>
+        <option value="oldest">Oldest first</option>
+      </select>
+    </div>
+
+    <div class="bulkbar" id="bulkbar" hidden>
+      <label class="left"><input class="chk" type="checkbox" id="selectAll" /> <span id="selText">Select all</span></label>
+      <div class="right">
+        <button class="btn danger sm" id="delSelected" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Delete selected</button>
+        <button class="btn danger-solid sm" id="delAll"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg> Delete all</button>
+        <button class="btn ghost sm" id="refresh" title="Refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
+      </div>
+    </div>
+
+    <div id="content"><!-- states / table / cards render here --></div>
+  </main>
+
+  <footer class="footer"><a href="/">← Make another link</a></footer>
+
+  <!-- Confirmation modal -->
+  <div class="modal-backdrop" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <div class="modal">
+      <div class="m-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div>
+      <h3 id="mTitle">Delete</h3>
+      <p id="mBody">Are you sure?</p>
+      <div class="m-actions">
+        <button class="btn secondary" id="mCancel">Cancel</button>
+        <button class="btn danger-solid" id="mConfirm">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-wrap" id="toasts"></div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const qs = new URLSearchParams(location.search);
+    const key = qs.get('key') || '';
+    const keyParam = key ? `?key=${encodeURIComponent(key)}` : '';
+
+    let all = [], view = [];
+    const selected = new Set();
+    const expanded = new Set();
+
+    const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+
+    // --- tiny inline icon set (Lucide-style) ---
+    const P = {
+      maps:'<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>',
+      copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+      trash:'<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+      chev:'<polyline points="6 9 12 15 18 9"/>',
+      inbox:'<polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.5 5.5 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.5A2 2 0 0 0 16.8 4H7.2a2 2 0 0 0-1.7 1.5Z"/>',
+      search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+      alert:'<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+      lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+    };
+    const ic = (n) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${P[n]}</svg>`;
+
+    function toast(msg, kind = 'success') {
+      const el = document.createElement('div');
+      el.className = `toast ${kind}`;
+      el.innerHTML = (kind === 'success'
+        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>'
+        : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>') + `<span>${esc(msg)}</span>`;
+      $('toasts').appendChild(el);
+      setTimeout(() => el.remove(), 2200);
+    }
+
+    // --- modal confirm (returns via callback) ---
+    let onConfirm = null;
+    function confirmModal({ title, body, confirmText = 'Delete', onOk }) {
+      $('mTitle').textContent = title;
+      $('mBody').textContent = body;
+      $('mConfirm').textContent = confirmText;
+      onConfirm = onOk;
+      $('modal').classList.add('show');
+      $('mConfirm').focus();
+    }
+    function closeModal() { $('modal').classList.remove('show'); onConfirm = null; }
+    $('mCancel').addEventListener('click', closeModal);
+    $('mConfirm').addEventListener('click', async () => { const fn = onConfirm; closeModal(); if (fn) await fn(); });
+    $('modal').addEventListener('click', (e) => { if (e.target === $('modal')) closeModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('modal').classList.contains('show')) closeModal(); });
+
+    // --- helpers ---
+    const bestCoords = (v) => v.preciseGeo?.latitude != null
+      ? { lat: v.preciseGeo.latitude, lon: v.preciseGeo.longitude }
+      : (v.ipGeo?.latitude ? { lat: v.ipGeo.latitude, lon: v.ipGeo.longitude } : null);
+    const mapsUrl = (c) => `https://www.google.com/maps/search/?api=1&query=${c.lat},${c.lon}`;
+    const approxOf = (v) => [v.ipGeo?.city, v.ipGeo?.region, v.ipGeo?.country].filter(Boolean).join(', ');
+
+    function detailsText(v) {
+      const c = bestCoords(v);
+      const out = [`${v.label || 'Unnamed link'}${v.id ? ` (${v.id})` : ''}`, v.time];
+      const a = approxOf(v); if (a) out.push(`Approx (IP): ${a}`);
+      if (v.preciseGeo?.latitude != null) {
+        out.push(`Precise: ${v.preciseGeo.latitude}, ${v.preciseGeo.longitude} (±${Math.round(v.preciseGeo.accuracy || 0)}m)`);
+        if (v.preciseGeo.place) out.push(`Near: ${v.preciseGeo.place}`);
+      }
+      if (c) out.push(`Google Maps: ${mapsUrl(c)}`);
+      if (v.ip) out.push(`IP: ${v.ip}`);
+      if (v.page) out.push(`Link: ${v.page}`);
+      if (v.userAgent) out.push(`Device: ${v.userAgent}`);
+      return out.join('\n');
+    }
+
+    const searchBlob = (v) => [v.label, v.id, v.ip, v.ipGeo?.city, v.ipGeo?.region, v.ipGeo?.country, v.preciseGeo?.place]
+      .filter(Boolean).join(' ').toLowerCase();
+
+    function badge(v) {
+      return v.preciseGeo?.latitude != null
+        ? '<span class="badge precise"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Precise</span>'
+        : '<span class="badge neutral">IP only</span>';
+    }
+
+    function detailInner(v) {
+      const c = bestCoords(v);
+      return `<dl class="detail-grid">
+        ${v.page ? `<dt>Link</dt><dd>${esc(v.page)}</dd>` : ''}
+        ${v.preciseGeo?.latitude != null ? `<dt>Coordinates</dt><dd>${esc(v.preciseGeo.latitude)}, ${esc(v.preciseGeo.longitude)}</dd><dt>Accuracy</dt><dd>±${Math.round(v.preciseGeo.accuracy||0)} m</dd>` : ''}
+        ${v.preciseGeo?.place ? `<dt>Near</dt><dd>${esc(v.preciseGeo.place)}</dd>` : ''}
+        ${v.ip ? `<dt>IP</dt><dd>${esc(v.ip)}</dd>` : ''}
+        ${v.userAgent ? `<dt>Device</dt><dd>${esc(v.userAgent)}</dd>` : ''}
+        ${c ? `<dt>Maps</dt><dd><a href="${mapsUrl(c)}" target="_blank" rel="noopener">Open in Google Maps</a></dd>` : ''}
+      </dl>`;
+    }
+
+    // --- rendering ---
+    function tableRow(v) {
+      const id = esc(v.visitId);
+      const isOpen = expanded.has(v.visitId) ? 'open' : '';
+      const checked = selected.has(v.visitId) ? 'checked' : '';
+      const c = bestCoords(v);
+      const a = approxOf(v) || 'Unknown';
+      const sub = v.preciseGeo?.place ? v.preciseGeo.place : 'IP-based (approximate)';
+      return `
+      <tr class="row">
+        <td class="col-chk"><input class="chk" type="checkbox" data-sel="${id}" ${checked} aria-label="Select"></td>
+        <td><div class="name-cell"><span class="nm">${esc(v.label || 'Unnamed link')}</span>${v.id ? `<span class="tag">${esc(v.id)}</span>` : ''}</div></td>
+        <td><div class="loc-cell"><span>${esc(a)}</span><span class="muted">${esc(sub)}</span></div></td>
+        <td class="muted">${esc(new Date(v.time).toLocaleString())}</td>
+        <td>${badge(v)}</td>
+        <td class="col-act"><div class="actions">
+          ${c ? `<a class="btn ghost icon" href="${mapsUrl(c)}" target="_blank" rel="noopener" title="Open in Google Maps">${ic('maps')}</a>` : ''}
+          <button class="btn ghost icon" data-copy="${id}" title="Copy details">${ic('copy')}</button>
+          <button class="btn ghost icon" data-exp="${id}" title="Details" aria-expanded="${isOpen ? 'true' : 'false'}" style="transition:transform .15s;${isOpen ? 'transform:rotate(180deg)' : ''}">${ic('chev')}</button>
+          <button class="btn ghost icon" data-del="${id}" title="Delete" style="color:var(--danger)">${ic('trash')}</button>
+        </div></td>
+      </tr>
+      <tr class="detail-row ${isOpen}" data-det="${id}"><td colspan="6"><div class="detail-inner">${detailInner(v)}</div></td></tr>`;
+    }
+
+    function cardItem(v) {
+      const id = esc(v.visitId);
+      const isOpen = expanded.has(v.visitId) ? 'open' : '';
+      const checked = selected.has(v.visitId) ? 'checked' : '';
+      const c = bestCoords(v);
+      const a = approxOf(v) || 'Unknown';
+      return `
+      <div class="vcard ${isOpen}">
+        <div class="vc-top">
+          <input class="chk" type="checkbox" data-sel="${id}" ${checked} aria-label="Select" style="margin-top:.2rem">
+          <div class="vc-main">
+            <div class="row" style="justify-content:space-between;gap:.5rem">
+              <div><span class="vc-name">${esc(v.label || 'Unnamed link')}</span> ${v.id ? `<span class="tag">${esc(v.id)}</span>` : ''}</div>
+              ${badge(v)}
+            </div>
+            <div class="vc-time">${esc(new Date(v.time).toLocaleString())}</div>
+            <div class="vc-loc">${esc(a)}<br><span class="muted">${esc(v.preciseGeo?.place ? v.preciseGeo.place : 'IP-based (approximate)')}</span></div>
+            <div class="detail-inner">${detailInner(v)}</div>
+            <div class="vc-actions">
+              ${c ? `<a class="btn secondary sm" href="${mapsUrl(c)}" target="_blank" rel="noopener">${ic('maps')} Maps</a>` : ''}
+              <button class="btn secondary sm" data-copy="${id}">${ic('copy')} Copy</button>
+              <button class="btn secondary sm" data-exp="${id}">${ic('chev')} Details</button>
+              <button class="btn danger sm" data-del="${id}">${ic('trash')} Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    function state({ kind = 'info', icon, title, text, action }) {
+      return `<div class="panel"><div class="state ${kind}">
+        <div class="s-ic">${ic(icon)}</div>
+        <h3>${esc(title)}</h3><p>${text}</p>
+        ${action || ''}
+      </div></div>`;
+    }
+
+    function computeView() {
+      const q = $('search').value.trim().toLowerCase();
+      const lf = $('filterLink').value;
+      let arr = all.slice();
+      if (lf) arr = arr.filter((v) => (v.label || 'Unnamed link') === lf);
+      if (q) arr = arr.filter((v) => searchBlob(v).includes(q));
+      arr.sort((a, b) => new Date(a.time) - new Date(b.time));
+      if ($('sort').value === 'newest') arr.reverse();
+      view = arr;
+    }
+
+    function renderStats() {
+      const linkCount = new Set(all.map((v) => v.id || v.label)).size;
+      $('stLinks').textContent = linkCount;
+      $('stVisits').textContent = all.length;
+      $('stSelected').textContent = selected.size;
+    }
+
+    function renderList() {
+      if (!view.length) {
+        if (!all.length) {
+          $('content').innerHTML = state({ icon: 'inbox', title: 'No visits yet',
+            text: 'Create a link on the New link page and share it. When someone opens it, their visit shows up here.',
+            action: '<a class="btn" href="/">Create a link</a>' });
+        } else {
+          $('content').innerHTML = state({ icon: 'search', title: 'No matching visits',
+            text: 'Nothing matches your search or filter. Try a different term or clear the filters.',
+            action: '<button class="btn secondary" id="clearF">Clear filters</button>' });
+          $('clearF')?.addEventListener('click', () => { $('search').value=''; $('filterLink').value=''; refresh(); });
+        }
+        return;
+      }
+      $('content').innerHTML = `
+        <div class="table-wrap desktop-only">
+          <table class="vtable">
+            <thead><tr>
+              <th class="col-chk"></th><th>Name</th><th>Location</th><th>Date &amp; time</th><th>Status</th><th class="col-act"></th>
+            </tr></thead>
+            <tbody>${view.map(tableRow).join('')}</tbody>
+          </table>
+        </div>
+        <div class="vcards mobile-only">${view.map(cardItem).join('')}</div>`;
+    }
+
+    function syncSelectionUI() {
+      document.querySelectorAll('[data-sel]').forEach((box) => { box.checked = selected.has(box.dataset.sel); });
+      const n = selected.size;
+      $('stSelected').textContent = n;
+      $('delSelected').disabled = n === 0;
+      $('selText').textContent = n ? `${n} selected` : 'Select all';
+      const ids = view.map((v) => v.visitId);
+      $('selectAll').checked = ids.length > 0 && ids.every((id) => selected.has(id));
+    }
+
+    function refreshView() { computeView(); renderList(); syncSelectionUI(); }
+
+    function populateFilter() {
+      const names = [...new Set(all.map((v) => v.label || 'Unnamed link'))].sort();
+      const cur = $('filterLink').value;
+      $('filterLink').innerHTML = '<option value="">All links</option>' + names.map((n) => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
+      if (names.includes(cur)) $('filterLink').value = cur;
+    }
+
+    async function load() {
+      $('bulkbar').hidden = true;
+      $('content').innerHTML = `<div class="table-wrap skeleton">${'<div class="sk-row"></div>'.repeat(5)}</div>`;
+      try {
+        const r = await fetch(`/api/visits${keyParam}`);
+        if (r.status === 401) {
+          $('content').innerHTML = state({ kind: 'warn', icon: 'lock', title: 'Dashboard locked',
+            text: 'This dashboard needs a key. Add <span class="mono">?key=YOUR_KEY</span> to the URL to view your visits.' });
+          renderStats();
+          return;
+        }
+        const d = await r.json();
+        if (d.ok === false && d.reason === 'store_unavailable') {
+          $('content').innerHTML = state({ kind: 'error', icon: 'alert', title: 'Storage not connected',
+            text: 'Visits can\'t load because Blob storage isn\'t set up yet. In Vercel: Storage → Create → Blob, connect it to this project, then redeploy.',
+            action: '<button class="btn secondary" id="retry">Try again</button>' });
+          $('retry')?.addEventListener('click', load);
+          return;
+        }
+        all = d.visits || [];
+        selected.clear();
+        expanded.clear();
+        $('keywarn').hidden = !!d.keyRequired;
+        $('bulkbar').hidden = all.length === 0;
+        renderStats();
+        populateFilter();
+        refreshView();
+      } catch {
+        $('content').innerHTML = state({ kind: 'error', icon: 'alert', title: 'Couldn\'t load visits',
+          text: 'Something went wrong talking to the server. Check your connection and try again.',
+          action: '<button class="btn secondary" id="retry">Try again</button>' });
+        $('retry')?.addEventListener('click', load);
+      }
+    }
+    const refresh = load;
+
+    async function doDelete(ids, successMsg) {
+      try {
+        const r = await fetch(`/api/visits${keyParam}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(ids ? { ids } : {}),
+        });
+        if (r.status === 401) { toast('Wrong or missing key', 'error'); return; }
+        const d = await r.json();
+        if (d.ok === false) { toast('Delete failed — storage unavailable', 'error'); return; }
+        toast(successMsg);
+        await load();
+      } catch { toast('Delete failed', 'error'); }
+    }
+
+    // --- events ---
+    document.addEventListener('click', async (e) => {
+      const copyBtn = e.target.closest('[data-copy]');
+      if (copyBtn) {
+        const v = all.find((x) => x.visitId === copyBtn.dataset.copy);
+        try { await navigator.clipboard.writeText(detailsText(v)); toast('Details copied'); }
+        catch { toast('Copy failed', 'error'); }
+        return;
+      }
+      const expBtn = e.target.closest('[data-exp]');
+      if (expBtn) {
+        const vid = expBtn.dataset.exp;
+        if (expanded.has(vid)) expanded.delete(vid); else expanded.add(vid);
+        // toggle without full re-render
+        document.querySelectorAll(`.detail-row[data-det="${CSS.escape(vid)}"]`).forEach((el) => el.classList.toggle('open'));
+        const card = expBtn.closest('.vcard'); if (card) card.classList.toggle('open');
+        document.querySelectorAll(`[data-exp="${CSS.escape(vid)}"]`).forEach((b) => {
+          const open = expanded.has(vid);
+          if (b.closest('.vtable')) b.style.transform = open ? 'rotate(180deg)' : '';
+          b.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+        return;
+      }
+      const delBtn = e.target.closest('[data-del]');
+      if (delBtn) {
+        const v = all.find((x) => x.visitId === delBtn.dataset.del);
+        confirmModal({
+          title: 'Delete this visit?',
+          body: `This permanently removes the visit to "${v?.label || 'Unnamed link'}" from ${new Date(v?.time).toLocaleString()}. This can't be undone.`,
+          onOk: () => doDelete([delBtn.dataset.del], 'Visit deleted'),
+        });
+      }
+    });
+
+    document.addEventListener('change', (e) => {
+      const box = e.target.closest('[data-sel]');
+      if (!box) return;
+      if (box.checked) selected.add(box.dataset.sel); else selected.delete(box.dataset.sel);
+      syncSelectionUI();
+    });
+
+    $('selectAll').addEventListener('change', (e) => {
+      view.forEach((v) => { if (e.target.checked) selected.add(v.visitId); else selected.delete(v.visitId); });
+      syncSelectionUI();
+    });
+
+    $('search').addEventListener('input', refreshView);
+    $('filterLink').addEventListener('change', refreshView);
+    $('sort').addEventListener('change', refreshView);
+    $('refresh').addEventListener('click', load);
+
+    $('delSelected').addEventListener('click', () => {
+      const ids = [...selected];
+      if (!ids.length) return;
+      confirmModal({
+        title: `Delete ${ids.length} selected visit${ids.length > 1 ? 's' : ''}?`,
+        body: `This permanently removes the ${ids.length} visit${ids.length > 1 ? 's you have' : ' you have'} selected. This can't be undone.`,
+        onOk: () => doDelete(ids, `${ids.length} visit${ids.length > 1 ? 's' : ''} deleted`),
+      });
+    });
+
+    $('delAll').addEventListener('click', () => {
+      if (!all.length) return;
+      confirmModal({
+        title: 'Delete all saved visits?',
+        body: `This permanently erases all ${all.length} saved visit${all.length > 1 ? 's' : ''} across every link. This can't be undone.`,
+        confirmText: 'Delete everything',
+        onOk: () => doDelete(null, 'All visits deleted'),
+      });
+    });
+
+    load();
+  </script>
+</body>
+</html>
