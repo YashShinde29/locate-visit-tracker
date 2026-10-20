@@ -3,14 +3,14 @@
 // DELETE /api/visits?key=...  (no ids)         → deletes ALL visits
 //
 // If DASHBOARD_KEY is set in your Vercel env vars, the key must match.
-// If it isn't set, access is open — the dashboard will warn you to set one.
+// If it isn't set, access stays locked until a key is configured.
 
 import { readVisits, deleteVisits, clearVisits } from '../lib/store.js';
 import { readJsonBody } from '../lib/http.js';
 
 function authorized(req) {
   const required = process.env.DASHBOARD_KEY;
-  if (!required) return true; // not configured → open (dashboard shows a warning)
+  if (!required) return false;
   const url = new URL(req.url, 'http://x');
   const key = url.searchParams.get('key') || req.headers['x-dashboard-key'] || '';
   return key === required;

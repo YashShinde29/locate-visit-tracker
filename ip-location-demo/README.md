@@ -1,12 +1,10 @@
-# Locate — a link that detects where it's opened
+# Locate ? article visits and a private dashboard
 
-Deploy free on Vercel. Create a named link to share; when someone opens it, the
-page shows an **approximate** location from their IP and asks **permission**
-before reading anything precise. Every visit is saved to a private **dashboard**
-where you can search, copy, open in Google Maps, and delete entries.
+The public home page and `/visit` show an Everyday Atlas article about the history of timekeeping. A visible privacy note explains visit collection. The page requests location through the browser's real permission prompt; reading and the optional Continue link work if permission is denied. Browsers may suppress automatic prompts, so an optional Share location button is also available.
 
-No traditional database. Storage is a **private Vercel Blob store** — one
-JSON file. At ~30–40 visits/month you stay far inside the free limits.
+Open `/dashboard?key=YOUR_SECRET` to create named article links and view visits. Set `DASHBOARD_KEY` in Vercel: visit access remains locked when it is missing or incorrect. Share only generated article links, never your dashboard URL.
+
+Visits use private Vercel Blob storage. Allowing precise location updates the existing visit rather than adding another row. This demo uses one JSON file and is intended for low traffic; simultaneous writes from different visitors can overwrite one another.
 
 ## Features
 
@@ -29,9 +27,9 @@ The UI loads the Inter font from Google Fonts (free, no key); everything else is
 ```
 ip-location-demo/
 ├─ public/
-│  ├─ index.html       # create & copy a named link
+│  ├─ index.html       # public history article
 │  ├─ visit.html       # the page visitors open — detects location
-│  ├─ dashboard.html   # your private list (search / copy / maps / delete)
+│  ├─ dashboard.html   # link creation and private visit list
 │  └─ style.css
 ├─ api/
 │  ├─ geo.js           # reads IP location from Vercel's geo headers
@@ -89,7 +87,7 @@ You only need this zip folder. Then:
 ### Daily use
 
 - Open your site → type a **custom name** → **Create link** → **Copy** → share it.
-- Watch visits at **/dashboard** (with your `?key=` if you set one).
+- Watch visits at **/dashboard?key=YOUR_SECRET**. Refresh the dashboard to load new visits.
 - Deleting: per-entry **Delete**, or tick boxes + **Delete selected**, or **Delete all**. Each asks to confirm.
 
 ### Updating after you change files
@@ -117,3 +115,7 @@ Reading someone's location — even roughly — without telling them can violate
 privacy laws (GDPR, CCPA, and others) and most platforms' terms. Keep the
 on-page notice, use it with people who understand what the link does, don't track
 anyone without consent, and clear old data periodically (now easy from the dashboard).
+
+## Verify an update
+
+Run `node --test tests/article.test.cjs` from this app folder. After pushing to GitHub and waiting for Vercel to finish, open a generated link, try both Allow and Block in fresh browser permission states, and confirm the dashboard records a visit. Allowed location should update that visit. Confirm `/api/visits` without a key returns 401. Browser prompts cannot be forced after a visitor has already allowed or blocked permission.

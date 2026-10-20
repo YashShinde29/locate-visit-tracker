@@ -1,0 +1,31 @@
+:root { color-scheme: light; font-family: system-ui, sans-serif; color: #243c34; background: #f7f6ef; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+[hidden] { display: none !important; }
+a { color: #285e49; text-underline-offset: 4px; }
+header { border-bottom: 1px solid #dcded2; }
+.masthead { max-width: 1040px; margin: auto; padding: 24px; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.wordmark { font: bold 27px Georgia, serif; text-decoration: none; }
+.edition, .eyebrow { font-size: 12px; text-transform: uppercase; letter-spacing: .14em; }
+main { max-width: 1000px; margin: auto; padding: 52px 24px; }
+.eyebrow { color: #64754c; font-weight: 700; }
+h1 { font: 500 clamp(38px, 6vw, 68px)/1.08 Georgia, serif; letter-spacing: -.035em; max-width: 780px; margin: 20px 0; }
+.intro { font-size: 19px; line-height: 1.7; max-width: 660px; color: #52645a; }
+.meta { font-size: 13px; color: #647267; margin: 24px 0 32px; }
+.privacy { background: #eaf0e4; border: 1px solid #cbd7c2; border-radius: 12px; padding: 18px 22px; font-size: 14px; line-height: 1.7; }
+.privacy p { margin: 4px 0 12px; }
+button, .continue { display: inline-block; border: 0; border-radius: 7px; padding: 11px 16px; background: #285e49; color: white; font: 600 14px system-ui, sans-serif; cursor: pointer; text-decoration: none; }
+button:disabled { opacity: .65; cursor: default; }
+:focus-visible { outline: 3px solid #b57927; outline-offset: 4px; }
+#locationStatus { margin: 8px 0 0; color: #42533c; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 52px; margin-top: 42px; }
+article { font: 19px/1.85 Georgia, serif; }
+article h2 { font-size: 29px; line-height: 1.25; margin-top: 34px; }
+article h2:first-child { margin-top: 0; }
+aside { border-top: 3px solid #285e49; padding-top: 16px; font-size: 14px; line-height: 1.7; }
+aside h2 { font-size: 15px; }
+aside a { display: block; margin-bottom: 13px; }
+.fact { background: #ebe8d9; border-radius: 10px; padding: 20px; margin-top: 28px; }
+.destination { margin-top: 38px; border-top: 1px solid #dcded2; padding-top: 24px; }
+footer { padding: 26px 24px; border-top: 1px solid #dcded2; text-align: center; color: #647267; font-size: 13px; }
+@media (max-width: 680px) { .layout { grid-template-columns: 1fr; gap: 28px; } main { padding-top: 32px; } .edition { display: none; } }

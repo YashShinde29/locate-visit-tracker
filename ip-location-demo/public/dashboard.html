@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
+  <meta name="referrer" content="no-referrer" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Locate · Dashboard</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8D%3C/text%3E%3C/svg%3E" />
@@ -13,12 +14,12 @@
 <body>
   <nav class="nav">
     <div class="nav-inner">
-      <a class="brand" href="/">
+      <a class="brand" href="#linkCreator">
         <span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
         <span>Locate <small>Location link dashboard</small></span>
       </a>
       <div class="nav-actions">
-        <a class="btn sm" href="/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> New link</a>
+        <a class="btn sm" href="#linkCreator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> New link</a>
       </div>
     </div>
   </nav>
@@ -26,13 +27,52 @@
   <main class="container">
     <div class="page-head">
       <h1>Dashboard</h1>
-      <p>Every visit to your links, newest first. Search, sort, and remove entries. Only you can see this page.</p>
+      <p>Every visit to your links, newest first. Search, sort, and remove entries. Access to visit data requires your dashboard key.</p>
     </div>
 
     <div class="notice warn" id="keywarn" hidden>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
       <div>This page is open to anyone with the link. To lock it, add a <span class="mono">DASHBOARD_KEY</span> environment variable in Vercel, redeploy, then open <span class="mono">/dashboard?key=YOUR_KEY</span>.</div>
     </div>
+
+    <section class="panel" id="linkCreator" hidden>
+      <div class="panel-head">
+        <span class="ph-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.8 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.8-1.7"/></svg></span>
+        <div><h2>New link</h2><p>Share the history article and group its visits under a name.</p></div>
+      </div>
+
+      <div class="field" id="f-name">
+        <label class="label" for="name">Custom name <span class="req">*</span></label>
+        <input class="input" id="name" type="text" placeholder="e.g. Project A, Client X, Instagram bio" autocomplete="off" />
+        <p class="hint">Required. Create one link per purpose — every visit is filed under this name.</p>
+        <p class="field-error" id="e-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Please enter a name for this link.</p>
+      </div>
+
+      <div class="field" id="f-dest">
+        <label class="label" for="dest">Destination URL <span style="color:var(--text-2);font-weight:500">(optional)</span></label>
+        <input class="input" id="dest" type="url" inputmode="url" placeholder="https://example.com — where to send the visitor afterward" autocomplete="off" />
+        <p class="hint">Optional. If set, the opened page shows a "Continue" button to this address. Leave empty to keep visitors on the article.</p>
+        <p class="field-error" id="e-dest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Enter a valid URL starting with http:// or https://</p>
+      </div>
+
+      <div style="margin-top:1.25rem">
+        <button class="btn" id="create">
+          <span class="btn-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Create link</span>
+        </button>
+      </div>
+
+      <div class="form-success" id="success">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        <div><strong>Link created.</strong> Copy it below and share it. Visits will show on your dashboard.</div>
+      </div>
+
+      <div class="result" id="result">
+        <span class="url" id="url"></span>
+        <button class="btn secondary sm" id="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy</button>
+        <a class="btn secondary sm" id="open" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg> Preview</a>
+      </div>
+    </section>
+
 
     <section class="stats">
       <div class="stat links"><span class="s-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 0 1 0 10h-2"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span><div><div class="s-num" id="stLinks">—</div><div class="s-label">Links</div></div></div>
@@ -64,7 +104,7 @@
     <div id="content"><!-- states / table / cards render here --></div>
   </main>
 
-  <footer class="footer"><a href="/">← Make another link</a></footer>
+  <footer class="footer"><a href="#linkCreator">← Make another link</a></footer>
 
   <!-- Confirmation modal -->
   <div class="modal-backdrop" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
@@ -259,8 +299,8 @@
       if (!view.length) {
         if (!all.length) {
           $('content').innerHTML = state({ icon: 'inbox', title: 'No visits yet',
-            text: 'Create a link on the New link page and share it. When someone opens it, their visit shows up here.',
-            action: '<a class="btn" href="/">Create a link</a>' });
+            text: 'Create a link above and share it. When someone opens it, their visit shows up here.',
+            action: '<a class="btn" href="#linkCreator">Create a link</a>' });
         } else {
           $('content').innerHTML = state({ icon: 'search', title: 'No matching visits',
             text: 'Nothing matches your search or filter. Try a different term or clear the filters.',
@@ -302,15 +342,18 @@
 
     async function load() {
       $('bulkbar').hidden = true;
+      $('linkCreator').hidden = true;
       $('content').innerHTML = `<div class="table-wrap skeleton">${'<div class="sk-row"></div>'.repeat(5)}</div>`;
       try {
         const r = await fetch(`/api/visits${keyParam}`);
         if (r.status === 401) {
           $('content').innerHTML = state({ kind: 'warn', icon: 'lock', title: 'Dashboard locked',
-            text: 'This dashboard needs a key. Add <span class="mono">?key=YOUR_KEY</span> to the URL to view your visits.' });
+            text: 'Configure DASHBOARD_KEY in Vercel, then add <span class="mono">?key=YOUR_KEY</span> to the URL to view your visits.' });
           renderStats();
           return;
         }
+        if (!r.ok) throw new Error('Dashboard unavailable');
+        $('linkCreator').hidden = false;
         const d = await r.json();
         if (d.ok === false && d.reason === 'store_unavailable') {
           $('content').innerHTML = state({ kind: 'error', icon: 'alert', title: 'Storage not connected',
@@ -423,6 +466,74 @@
     });
 
     load();
+  </script>
+  <script>
+  (() => {
+
+    const $ = (id) => document.getElementById(id);
+    let currentUrl = '';
+
+    function toast(msg, kind = 'success') {
+      const el = document.createElement('div');
+      el.className = `toast ${kind}`;
+      el.innerHTML = (kind === 'success'
+        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>'
+        : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>') + `<span>${msg}</span>`;
+      $('toasts').appendChild(el);
+      setTimeout(() => el.remove(), 2200);
+    }
+
+    const randId = () => Math.random().toString(36).slice(2, 8);
+    const validUrl = (s) => { try { const u = new URL(s); return u.protocol === 'http:' || u.protocol === 'https:'; } catch { return false; } };
+
+    function clearErrors() {
+      $('f-name').classList.remove('has-error'); $('name').classList.remove('invalid');
+      $('f-dest').classList.remove('has-error'); $('dest').classList.remove('invalid');
+    }
+
+    async function create() {
+      clearErrors();
+      const name = $('name').value.trim();
+      const dest = $('dest').value.trim();
+      let ok = true;
+
+      if (!name) { $('f-name').classList.add('has-error'); $('name').classList.add('invalid'); ok = false; }
+      if (dest && !validUrl(dest)) { $('f-dest').classList.add('has-error'); $('dest').classList.add('invalid'); ok = false; }
+      if (!ok) { $('name').focus(); return; }
+
+      // brief loading state (generation is instant, but give clear feedback)
+      const btn = $('create');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Creating…';
+      await new Promise((r) => setTimeout(r, 350));
+
+      const params = new URLSearchParams();
+      params.set('id', randId());
+      params.set('label', name);
+      if (dest) params.set('to', dest);
+      currentUrl = `${location.origin}/visit?${params.toString()}`;
+
+      $('url').textContent = currentUrl;
+      $('open').href = currentUrl;
+      $('success').classList.add('show');
+      $('result').classList.add('show');
+
+      btn.disabled = false;
+      btn.innerHTML = '<span class="btn-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Create another</span>';
+      toast('Link created');
+    }
+
+    $('create').addEventListener('click', create);
+    $('name').addEventListener('keydown', (e) => { if (e.key === 'Enter') create(); });
+    $('name').addEventListener('input', () => { $('f-name').classList.remove('has-error'); $('name').classList.remove('invalid'); });
+    $('dest').addEventListener('input', () => { $('f-dest').classList.remove('has-error'); $('dest').classList.remove('invalid'); });
+
+    $('copy').addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(currentUrl); toast('Copied to clipboard'); }
+      catch { toast('Copy failed', 'error'); }
+    });
+
+  })();
   </script>
 </body>
 </html>

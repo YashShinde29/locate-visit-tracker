@@ -36,7 +36,18 @@ export async function readVisits() {
 
 export async function addVisit(visit) {
   const visits = await readVisits();
-  visits.unshift(visit); // newest first
+  const existing = visits.findIndex((item) => item.visitId === visit.visitId);
+  if (existing >= 0) {
+    // Preserve the original arrival time and any precise location already saved.
+    visits[existing] = {
+      ...visits[existing],
+      ...visit,
+      time: visits[existing].time,
+      preciseGeo: visit.preciseGeo || visits[existing].preciseGeo,
+    };
+  } else {
+    visits.unshift(visit);
+  }
   const capped = visits.slice(0, MAX_KEPT);
   await write(capped);
   return capped.length;

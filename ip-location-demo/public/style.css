@@ -332,3 +332,5 @@ table.vtable { width: 100%; border-collapse: collapse; font-size: .88rem; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
 }
+/* Keep hidden controls and notices out of the layout even when they use flex. */
+[hidden] { display: none !important; }

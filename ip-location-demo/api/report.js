@@ -19,7 +19,9 @@ export default async function handler(req, res) {
   const body = await readJsonBody(req);
 
   const visit = {
-    visitId: newVisitId(),           // unique per saved visit (used for deletion)
+    // A page uses one UUID for its approximate visit and permission update.
+    visitId: typeof body.visitId === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(body.visitId)
+      ? body.visitId : newVisitId(),
     id: body.id || '',               // the link's short id
     label: body.label || '',         // the link's custom name
     ip: body.ip || '',

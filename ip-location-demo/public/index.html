@@ -2,157 +2,45 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Locate · Create a tracking link</title>
-  <meta name="description" content="Create a named link that shows an approximate location when opened." />
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8D%3C/text%3E%3C/svg%3E" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="A short read about how people learned to measure time, from shadows to atomic clocks." />
+  <meta name="referrer" content="no-referrer" />
+  <title>The story of time | Everyday Atlas</title>
+  <link rel="stylesheet" href="/article.css" />
+  <script src="/article.js" defer></script>
 </head>
 <body>
-  <nav class="nav">
-    <div class="nav-inner">
-      <a class="brand" href="/">
-        <span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
-        <span>Locate <small>Location link dashboard</small></span>
-      </a>
-      <div class="nav-actions">
-        <a class="btn secondary sm" href="/dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg> Dashboard</a>
-      </div>
-    </div>
-  </nav>
-
-  <main class="container narrow">
-    <div class="page-head">
-      <h1>Create a tracking link</h1>
-      <p>Give each link a name, share it, and see where it's opened on your dashboard. Approximate location comes from the visitor's IP; precise location is only read if they allow it.</p>
-    </div>
-
-    <section class="panel">
-      <div class="panel-head">
-        <span class="ph-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.8 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.8-1.7"/></svg></span>
-        <div><h2>New link</h2><p>Name it so you can tell your links apart later.</p></div>
-      </div>
-
-      <div class="field" id="f-name">
-        <label class="label" for="name">Custom name <span class="req">*</span></label>
-        <input class="input" id="name" type="text" placeholder="e.g. Project A, Client X, Instagram bio" autocomplete="off" />
-        <p class="hint">Required. Create one link per purpose — every visit is filed under this name.</p>
-        <p class="field-error" id="e-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Please enter a name for this link.</p>
-      </div>
-
-      <div class="field" id="f-dest">
-        <label class="label" for="dest">Destination URL <span style="color:var(--text-2);font-weight:500">(optional)</span></label>
-        <input class="input" id="dest" type="url" inputmode="url" placeholder="https://example.com — where to send the visitor afterward" autocomplete="off" />
-        <p class="hint">Optional. If set, the opened page shows a "Continue" button to this address. Leave empty to just show the location page.</p>
-        <p class="field-error" id="e-dest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Enter a valid URL starting with http:// or https://</p>
-      </div>
-
-      <div style="margin-top:1.25rem">
-        <button class="btn" id="create">
-          <span class="btn-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Create link</span>
-        </button>
-      </div>
-
-      <div class="form-success" id="success">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-        <div><strong>Link created.</strong> Copy it below and share it. Visits will show on your dashboard.</div>
-      </div>
-
-      <div class="result" id="result">
-        <span class="url" id="url"></span>
-        <button class="btn secondary sm" id="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy</button>
-        <a class="btn secondary sm" id="open" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg> Preview</a>
-      </div>
+  <header><div class="masthead"><a href="/" class="wordmark">Everyday Atlas<span aria-hidden="true">.</span></a><span class="edition">Small stories. A wider world.</span></div></header>
+  <main>
+    <div class="eyebrow">History &amp; everyday discoveries</div>
+    <h1>How did we learn<br>to measure time?</h1>
+    <p class="intro">From a shadow moving across the ground to the quiet precision of an atomic clock, keeping time tells a remarkable story about human curiosity.</p>
+    <p class="meta">The everyday history series &nbsp; / &nbsp; 3 minute read</p>
+    <section class="privacy" aria-label="Location and privacy">
+      <strong>A note about your visit</strong>
+      <p>This page records your IP address and approximate location for the site owner's visit dashboard. Your browser may ask for precise location access; choosing Allow shares your coordinates with the owner. Sharing is optional, and you can read everything if you choose Block.</p>
+      <button id="shareLocation" type="button">Share location (optional)</button>
+      <p id="locationStatus" role="status" aria-live="polite">Location permission is controlled by your browser.</p>
     </section>
-
-    <section class="panel">
-      <div class="panel-head">
-        <span class="ph-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span>
-        <div><h2>How it works</h2></div>
-      </div>
-      <div class="detail-grid" style="grid-template-columns:auto 1fr; gap:.6rem 1rem; font-family:inherit; font-size:.9rem">
-        <dt style="font-family:var(--mono);color:var(--primary)">IP</dt><dd style="font-family:inherit">Approximate location (usually the city) is read on the server, no key needed.</dd>
-        <dt style="font-family:var(--mono);color:var(--primary)">GPS</dt><dd style="font-family:inherit">Precise location needs the visitor to tap <em>Allow</em> — the browser enforces this.</dd>
-        <dt style="font-family:var(--mono);color:var(--primary)">Saved</dt><dd style="font-family:inherit">Every visit is stored and shown on your <a href="/dashboard">dashboard</a>, where you can search and delete it.</dd>
-      </div>
-    </section>
-
-    <div class="notice warn" style="margin-top:1rem">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-      <div><strong>Use it responsibly.</strong> Reading someone's location without telling them can break privacy laws and platform rules. Use links with people who know what they do, and don't track anyone without consent.</div>
+    <div class="layout">
+      <article>
+        <h2 id="shadows">01. Reading the shadows</h2>
+        <p>Long before clocks had hands, people watched the sky. The rising and setting Sun marked the shape of a day, while the changing seasons helped communities decide when to plant and harvest.</p>
+        <p>A sundial turns that daily movement into something you can read. As the Sun appears to move, a pointer casts a shadow across a marked surface. Its simplicity has a limitation: a sundial needs sunlight, and its reading depends on where it is placed.</p>
+        <h2 id="water">02. Letting water count</h2>
+        <p>What happens when the Sun disappears? Water clocks offered another way to track passing time. By watching water flow into or out of a container, people could measure an interval without relying on a visible shadow.</p>
+        <p>These devices were not as precise as modern clocks, but they illustrate an enduring idea: use a predictable change to measure something we cannot hold in our hands.</p>
+        <h2 id="machines">03. Giving time a mechanism</h2>
+        <p>Mechanical clocks brought gears and carefully controlled motion into the story. Later, pendulums provided a repeating swing that helped clocks keep a steadier rhythm.</p>
+        <p>Timekeeping gradually moved from public clock towers into homes and pockets. A shared sense of the hour became increasingly useful as travel, work, and communication connected people across greater distances.</p>
+        <h2 id="today">04. Finding a steadier rhythm</h2>
+        <p>Many modern clocks use a vibrating quartz crystal to keep time. Atomic clocks go further, using a precisely defined frequency associated with atoms as their reference.</p>
+        <p>The technology has changed, but the question remains familiar: what repeats reliably enough for us to count it? From shadows to atoms, the answer has helped us find our place in a moving world.</p>
+      </article>
+      <aside aria-label="In this story"><h2>In this story</h2><a href="#shadows">Reading the shadows</a><a href="#water">Letting water count</a><a href="#machines">A mechanical rhythm</a><a href="#today">Timekeeping today</a><div class="fact"><strong>Think about it</strong><p>A clock measures change. Every tick is a small event that we agree to count.</p></div></aside>
     </div>
+    <section id="destination" class="destination" hidden><h2>Keep exploring</h2><p>This shared article includes a link to <strong id="destinationHost"></strong>. Opening it does not require sharing your location.</p><a id="continueLink" class="continue" rel="noopener noreferrer">Continue to destination &rarr;</a></section>
   </main>
-
-  <footer class="footer">Runs free on Vercel · Blob storage · no paid APIs</footer>
-
-  <div class="toast-wrap" id="toasts"></div>
-
-  <script>
-    const $ = (id) => document.getElementById(id);
-    let currentUrl = '';
-
-    function toast(msg, kind = 'success') {
-      const el = document.createElement('div');
-      el.className = `toast ${kind}`;
-      el.innerHTML = (kind === 'success'
-        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>'
-        : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>') + `<span>${msg}</span>`;
-      $('toasts').appendChild(el);
-      setTimeout(() => el.remove(), 2200);
-    }
-
-    const randId = () => Math.random().toString(36).slice(2, 8);
-    const validUrl = (s) => { try { const u = new URL(s); return u.protocol === 'http:' || u.protocol === 'https:'; } catch { return false; } };
-
-    function clearErrors() {
-      $('f-name').classList.remove('has-error'); $('name').classList.remove('invalid');
-      $('f-dest').classList.remove('has-error'); $('dest').classList.remove('invalid');
-    }
-
-    async function create() {
-      clearErrors();
-      const name = $('name').value.trim();
-      const dest = $('dest').value.trim();
-      let ok = true;
-
-      if (!name) { $('f-name').classList.add('has-error'); $('name').classList.add('invalid'); ok = false; }
-      if (dest && !validUrl(dest)) { $('f-dest').classList.add('has-error'); $('dest').classList.add('invalid'); ok = false; }
-      if (!ok) { $('name').focus(); return; }
-
-      // brief loading state (generation is instant, but give clear feedback)
-      const btn = $('create');
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span> Creating…';
-      await new Promise((r) => setTimeout(r, 350));
-
-      const params = new URLSearchParams();
-      params.set('id', randId());
-      params.set('label', name);
-      if (dest) params.set('to', dest);
-      currentUrl = `${location.origin}/visit?${params.toString()}`;
-
-      $('url').textContent = currentUrl;
-      $('open').href = currentUrl;
-      $('success').classList.add('show');
-      $('result').classList.add('show');
-
-      btn.disabled = false;
-      btn.innerHTML = '<span class="btn-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Create another</span>';
-      toast('Link created');
-    }
-
-    $('create').addEventListener('click', create);
-    $('name').addEventListener('keydown', (e) => { if (e.key === 'Enter') create(); });
-    $('name').addEventListener('input', () => { $('f-name').classList.remove('has-error'); $('name').classList.remove('invalid'); });
-    $('dest').addEventListener('input', () => { $('f-dest').classList.remove('has-error'); $('dest').classList.remove('invalid'); });
-
-    $('copy').addEventListener('click', async () => {
-      try { await navigator.clipboard.writeText(currentUrl); toast('Copied to clipboard'); }
-      catch { toast('Copy failed', 'error'); }
-    });
-  </script>
+  <footer>Everyday Atlas &middot; A little more to know.</footer>
 </body>
 </html>
