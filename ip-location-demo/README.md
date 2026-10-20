@@ -5,7 +5,7 @@ page shows an **approximate** location from their IP and asks **permission**
 before reading anything precise. Every visit is saved to a private **dashboard**
 where you can search, copy, open in Google Maps, and delete entries.
 
-No traditional database. Storage is **Vercel Blob** (free object storage) — one
+No traditional database. Storage is a **private Vercel Blob store** — one
 JSON file. At ~30–40 visits/month you stay far inside the free limits.
 
 ## Features
@@ -75,18 +75,13 @@ You only need this zip folder. Then:
 # 2) Host it on Vercel (free)
 
 1. **Create a free account** at https://vercel.com (sign in with GitHub, GitLab, or email).
-2. **Get the project to Vercel** — either way is fine:
-   - **Drag-and-drop:** Vercel dashboard → **Add New → Project → Deploy** → drag the project folder in. *(Do not include `node_modules`.)*
-   - **Or via GitHub:** push the folder to a repo, then **Add New → Project → Import** that repo.
-3. On the configure screen, set **Framework Preset = Other**. Leave build settings empty. Click **Deploy**.
+2. **Get the project to Vercel** — push it to a GitHub repo, then use **Add New → Project → Import** in Vercel. If the repository contains an outer folder named `ip-location-demo`, set **Root Directory** to `ip-location-demo`. Otherwise use `./`. The root must contain `package.json`, `api/`, and `public/`.
+3. On the configure screen, set **Framework Preset = Other**. Leave build settings empty. Set a strong `DASHBOARD_KEY` environment variable for Production before clicking **Deploy**.
 4. When it finishes you get a URL like `https://your-app.vercel.app`.
 5. **Turn on storage (required for saving):**
-   Project → **Storage** → **Create Database** → **Blob** → connect it to this project.
-   This adds a `BLOB_READ_WRITE_TOKEN` automatically. Then **redeploy once**
+   Project → **Storage** → **Create Storage** → **Blob** → choose **Private** and connect it to this project. The app requires a private store; a public store will not work with the storage code. Vercel adds the Blob credentials automatically. Then **redeploy once**
    (Deployments → latest → **Redeploy**) so the functions pick it up.
-6. **Lock your dashboard (recommended):**
-   Project → **Settings → Environment Variables** → add
-   `DASHBOARD_KEY` = any secret you choose → **Save** → **Redeploy**.
+6. **Open your dashboard:**
    Open your dashboard as `https://your-app.vercel.app/dashboard?key=YOUR_SECRET`.
 7. **(Optional) Live alerts:** add an env var `WEBHOOK_URL` = a Discord/Slack
    incoming webhook URL, then redeploy. Each visit is also posted there.
@@ -100,7 +95,7 @@ You only need this zip folder. Then:
 ### Updating after you change files
 
 - GitHub import: just `git push` — Vercel redeploys automatically.
-- Drag-and-drop: drag the folder in again, or run `vercel --prod` from the CLI.
+- You can also run `vercel --prod` from the app directory after linking the project with the Vercel CLI.
 
 ---
 

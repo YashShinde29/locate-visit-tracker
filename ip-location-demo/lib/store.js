@@ -1,10 +1,10 @@
 // Stores all visits in a single JSON file in Vercel Blob (free object storage).
 // No database. At ~40 visits/month this stays far inside the free Hobby limits.
 //
-// The blob's URL is unguessable and is never sent to the browser — the dashboard
-// reads data only through the server, gated by DASHBOARD_KEY.
+// Visits are stored in a private Blob store. The dashboard reads them through
+// the server, gated by DASHBOARD_KEY.
 
-import { put, list, del } from '@vercel/blob';
+import { put, get, list, del } from '@vercel/blob';
 
 const PATHNAME = 'data/visits.json';
 const MAX_KEPT = 1000; // safety cap so the file can't grow forever
@@ -16,7 +16,7 @@ async function findBlob() {
 
 async function write(visits) {
   await put(PATHNAME, JSON.stringify(visits), {
-    access: 'public',
+    access: 'private',
     contentType: 'application/json',
     addRandomSuffix: false,
     allowOverwrite: true,
@@ -24,12 +24,10 @@ async function write(visits) {
 }
 
 export async function readVisits() {
-  const found = await findBlob();
-  if (!found) return [];
-  const res = await fetch(found.url, { cache: 'no-store' });
-  if (!res.ok) return [];
+  const result = await get(PATHNAME, { access: 'private' });
+  if (!result || result.statusCode !== 200) return [];
   try {
-    const data = await res.json();
+    const data = await new Response(result.stream).json();
     return Array.isArray(data) ? data : [];
   } catch {
     return [];
