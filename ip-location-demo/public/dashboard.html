@@ -505,13 +505,27 @@
       const btn = $('create');
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span> Creating…';
-      await new Promise((r) => setTimeout(r, 350));
+      let publicOrigin;
+      try {
+        const response = await fetch('/api/site', { signal: AbortSignal.timeout(10000) });
+        if (!response.ok) throw new Error('Public address unavailable');
+        const config = await response.json();
+        publicOrigin = config.publicOrigin || location.origin;
+        const base = new URL(publicOrigin);
+        if (!['https:', 'http:'].includes(base.protocol)) throw new Error('Invalid address');
+        publicOrigin = base.origin;
+      } catch {
+        btn.disabled = false;
+        btn.textContent = 'Create link';
+        toast('Could not load the public website address. Check PUBLIC_SITE_URL in Vercel and try again.', 'error');
+        return;
+      }
 
       const params = new URLSearchParams();
       params.set('id', randId());
       params.set('label', name);
       if (dest) params.set('to', dest);
-      currentUrl = `${location.origin}/visit?${params.toString()}`;
+      currentUrl = `${publicOrigin}/visit?${params.toString()}`;
 
       $('url').textContent = currentUrl;
       $('open').href = currentUrl;

@@ -118,4 +118,12 @@ anyone without consent, and clear old data periodically (now easy from the dashb
 
 ## Verify an update
 
+### Sharing on WhatsApp
+
+The dashboard generates `/visit` links using Vercel's production domain, even when you open the dashboard through a preview/deployment URL. You can override this by setting `PUBLIC_SITE_URL` to your full public HTTPS origin (for example, `https://your-domain.com`) in Vercel and redeploying. Do not include a path or dashboard key.
+
+If visitors see a Vercel login screen, check Project Settings → Deployment Protection. Standard Protection leaves production domains public; All Deployments also protects the production domain. The dashboard's own `DASHBOARD_KEY` still protects visit data when the article is public. Create fresh links after deploying this update; old preview links are not automatically changed. Test a fresh article link in a signed-out browser.
+
+Run all checks with `node --test tests/*.test.cjs`.
+
 Run `node --test tests/article.test.cjs` from this app folder. After pushing to GitHub and waiting for Vercel to finish, open a generated link, try both Allow and Block in fresh browser permission states, and confirm the dashboard records a visit. Allowed location should update that visit. Confirm `/api/visits` without a key returns 401. Browser prompts cannot be forced after a visitor has already allowed or blocked permission.
