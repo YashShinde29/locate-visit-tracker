@@ -24,7 +24,7 @@ async function write(visits) {
 }
 
 export async function readVisits() {
-  const result = await get(PATHNAME, { access: 'private' });
+  const result = await get(PATHNAME, { access: 'private', useCache: false });
   if (!result || result.statusCode !== 200) return [];
   try {
     const data = await new Response(result.stream).json();

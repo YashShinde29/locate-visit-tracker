@@ -5,18 +5,6 @@ let ipGeo = {};
 let reporting = Promise.resolve();
 let requesting = false;
 
-const destination = params.get('to');
-if (destination) {
-  try {
-    const url = new URL(destination);
-    if (['https:', 'http:'].includes(url.protocol)) {
-      $('continueLink').href = url.href;
-      $('destinationHost').textContent = url.host;
-      $('destination').hidden = false;
-    }
-  } catch { /* Invalid destinations are not shown. */ }
-}
-
 function report(preciseGeo) {
   // Serialize this page's initial visit and optional location update.
   reporting = reporting.catch(() => {}).then(async () => {
@@ -27,7 +15,7 @@ function report(preciseGeo) {
       body: JSON.stringify({
         visitId,
         id: params.get('id') || 'article',
-        label: params.get('label') || 'The story of time',
+        label: params.get('label') || document.querySelector('h1')?.textContent || 'Public article',
         ip: ipGeo.ip || '', ipGeo, preciseGeo,
         userAgent: navigator.userAgent,
         page: location.href,
@@ -45,6 +33,7 @@ const initialVisit = (async () => {
     const response = await fetch('/api/geo', { signal: AbortSignal.timeout(8000) });
     if (response.ok) ipGeo = await response.json();
   } catch { /* Reading the article does not depend on the location service. */ }
+  await window.pageContentReady;
   try { await report(null); }
   catch { $('locationStatus').textContent = 'Visit storage is currently unavailable. You can still read the article.'; }
 })();

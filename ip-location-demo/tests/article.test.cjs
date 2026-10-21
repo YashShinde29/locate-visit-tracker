@@ -20,7 +20,7 @@ function page({ search = '', supported = true, save = true } = {}) {
     return elements.get(id);
   };
   const sandbox = {
-    document: { getElementById: element },
+    document: { getElementById: element, querySelector: () => ({ textContent: 'Published article' }) },
     location: { search, href: `https://example.test/visit${search}` },
     navigator: {
       userAgent: 'test-browser',
@@ -48,7 +48,7 @@ test('Allow sends an update for the same visit and retains link metadata', async
   await flush();
   assert.equal(p.reports.length, 1);
   assert.equal(p.reports[0].preciseGeo, null);
-  assert.equal(p.element('destination').hidden, false);
+  assert.equal(p.element('destination').hidden, true);
   await p.permission().allow({ coords: { latitude: 18.5, longitude: 73.8, accuracy: 20 } });
   assert.equal(p.reports.length, 2);
   assert.equal(p.reports[1].visitId, p.reports[0].visitId);
@@ -58,14 +58,14 @@ test('Allow sends an update for the same visit and retains link metadata', async
   assert.match(p.element('locationStatus').textContent, /shared with the site owner/);
 });
 
-test('Block saves only the approximate visit and keeps the destination available', async () => {
+test('Block saves only the approximate visit without requiring a destination', async () => {
   const p = page({ search: '?to=https://example.org' });
   p.start();
   p.permission().deny({ code: 1 });
   await flush();
   assert.equal(p.reports.length, 1);
   assert.equal(p.reports[0].preciseGeo, null);
-  assert.equal(p.element('destination').hidden, false);
+  assert.equal(p.element('destination').hidden, true);
   assert.match(p.element('locationStatus').textContent, /not shared/);
 });
 
@@ -93,7 +93,7 @@ test('Failed saves do not claim that precise location was shared', async () => {
 });
 
 test('All inline scripts parse and page element IDs are unique', () => {
-  for (const name of ['index.html', 'visit.html', 'dashboard.html']) {
+  for (const name of ['index.html', 'visit.html', 'dashboard.html', 'admin.html']) {
     const html = fs.readFileSync(path.join(root, 'public', name), 'utf8');
     for (const match of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)) {
       new vm.Script(match[1], { filename: name });
