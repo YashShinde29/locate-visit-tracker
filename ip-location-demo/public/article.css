@@ -12,7 +12,7 @@ main { max-width: 1000px; margin: auto; padding: 52px 24px; }
 h1 { font: 500 clamp(38px, 6vw, 68px)/1.08 Georgia, serif; letter-spacing: -.035em; max-width: 780px; margin: 20px 0; }
 .intro { font-size: 19px; line-height: 1.7; max-width: 660px; color: #52645a; }
 .meta { font-size: 13px; color: #647267; margin: 24px 0 32px; }
-.privacy { background: #eaf0e4; border: 1px solid #cbd7c2; border-radius: 12px; padding: 18px 22px; font-size: 14px; line-height: 1.7; }
+.privacy { max-width: 760px; margin: 18px auto 0; font-size: 13px; font-weight: 400; line-height: 1.7; color: #52645a; }
 .privacy p { margin: 4px 0 12px; }
 button, .continue { display: inline-block; border: 0; border-radius: 7px; padding: 11px 16px; background: #285e49; color: white; font: 600 14px system-ui, sans-serif; cursor: pointer; text-decoration: none; }
 button:disabled { opacity: .65; cursor: default; }
@@ -29,3 +29,6 @@ aside a { display: block; margin-bottom: 13px; }
 .destination { margin-top: 38px; border-top: 1px solid #dcded2; padding-top: 24px; }
 footer { padding: 26px 24px; border-top: 1px solid #dcded2; text-align: center; color: #647267; font-size: 13px; }
 @media (max-width: 680px) { .layout { grid-template-columns: 1fr; gap: 28px; } main { padding-top: 32px; } .edition { display: none; } }
+
+.privacy button { background: none; color: inherit; padding: 6px; font: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.privacy #locationStatus { color: inherit; }

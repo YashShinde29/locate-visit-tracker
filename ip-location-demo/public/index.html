@@ -17,12 +17,6 @@
     <h1>How did we learn<br>to measure time?</h1>
     <p class="intro">From a shadow moving across the ground to the quiet precision of an atomic clock, keeping time tells a remarkable story about human curiosity.</p>
     <p class="meta">The everyday history series &nbsp; / &nbsp; 3 minute read</p>
-    <section class="privacy" aria-label="Location and privacy">
-      <strong>A note about your visit</strong>
-      <p>This page records your IP address and approximate location for the site owner's visit dashboard. Your browser may ask for precise location access; choosing Allow shares your coordinates with the owner. Sharing is optional, and you can read everything if you choose Block.</p>
-      <button id="shareLocation" type="button">Share location (optional)</button>
-      <p id="locationStatus" role="status" aria-live="polite">Location permission is controlled by your browser.</p>
-    </section>
     <div class="layout">
       <article>
         <h2 id="shadows">01. Reading the shadows</h2>
@@ -42,6 +36,13 @@
     </div>
     <section id="destination" class="destination" hidden><h2>Keep exploring</h2><p>This shared article includes a link to <strong id="destinationHost"></strong>. Opening it does not require sharing your location.</p><a id="continueLink" class="continue" rel="noopener noreferrer">Continue to destination &rarr;</a></section>
   </main>
-  <footer>Everyday Atlas &middot; A little more to know.</footer>
+  <footer>
+    <p>Everyday Atlas &middot; A little more to know.</p>
+    <div class="privacy" aria-label="Location and privacy">
+      <p>This site records approximate location. Allow browser permission to share precise location with the site owner.</p>
+      <button id="shareLocation" type="button">Share location (optional)</button>
+      <p id="locationStatus" role="status" aria-live="polite"></p>
+    </div>
+  </footer>
 </body>
 </html>
